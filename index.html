@@ -141,6 +141,10 @@
             })
             document.getElementById("copy").addEventListener("click", () => {
                 navigator.clipboard.writeText(getQuery());
+                document.getElementById("copy").getElementsByTagName("span")[1].innerText = "已複製！";
+                sleep(1000).then(() => {
+                    document.getElementById("copy").getElementsByTagName("span")[1].innerText = "複製到剪貼簿";
+                });
             });
             makeVtuberMenu();
         })
@@ -250,19 +254,19 @@
             <div class="column">
                 <button class="ts-button is-start-icon is-secondary" id="copy">
                     <span class="ts-icon is-copy-icon"></span>
-                    複製到剪貼簿
+                    <span>複製到剪貼簿</span>
                 </button>
             </div>
         </div>
         <div class="ts-space is-large"></div>
         <div class="ts-text is-center-aligned is-description">
-            Made by <a href="https://leko.moe">Leko</a> and <a href="https://edisonlee55.com">edisonlee55</a> with ❤️ 
+            Made by <a href="https://leko.moe">Leko</a> and <a href="https://edisonlee55.com">edisonlee55</a> with ❤️
         </div>
         <div class="ts-space is-large"></div>
         <div class="ts-text is-center-aligned is-description">
             © <span id="year"></span> NYCU VTuber Club
         </div>
-        
+
     </div>
 
     <template id="field-vtuber-selected-chip-template">
