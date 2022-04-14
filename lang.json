@@ -30,9 +30,9 @@
         "videos": "Videos",
         "links": "Links",
         "twitter-spaces": "Twitter Spaces",
-        "min-retweet": "Minimum Retweets",
-        "min-like": "Minimum Likes",
-        "min-reply": "Minimum replies",
+        "min-retweet": "Min. Retweets",
+        "min-like": "Min. Likes",
+        "min-reply": "Min. replies",
         "search": "Search"
     }
 }
