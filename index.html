@@ -66,15 +66,15 @@
             return window.langs[window.lang][key];
         }
 
-        function getFlagClass(flagLang){
+        function getFlagClass(flagLang) {
             return `is-${flagLang}-flag`
         }
 
-        function showLangMenu(){
+        function showLangMenu() {
             document.getElementById('langMenu').classList.add('is-visible');
         }
 
-        function hideLangMenu(){
+        function hideLangMenu() {
             document.getElementById('langMenu').classList.remove('is-visible');
         }
 
@@ -83,7 +83,7 @@
             window.lang = "zh-TW";
             window.langFlag = "taiwan";
             window.langText = "台灣正體";
-            
+
             document.getElementById("currentLang").innerText = window.langText;
             changeLang();
 
@@ -91,14 +91,14 @@
                 b.addEventListener("click", () => {
                     const flagDOM = document.getElementById("currentLangFlag");
                     flagDOM.classList.remove(getFlagClass(window.langFlag));
-                    
+
                     window.lang = b.dataset.targetLang;
                     window.langFlag = b.dataset.targetLangFlag;
                     window.langText = b.querySelector(".langText").innerText;
 
                     flagDOM.classList.add(getFlagClass(window.langFlag));
                     document.getElementById("currentLang").innerText = window.langText;
-                    
+
                     changeLang();
                 })
             });
@@ -282,13 +282,13 @@
                     </button>
                     <div class="ts-menu is-dropdown is-start-icon is-bottom-left" id="langMenu">
                         <button class="item lang-button" data-target-lang="zh-TW" data-target-lang-flag="taiwan">
-                            <span class="ts-flag is-taiwan-flag" ></span>
+                            <span class="ts-flag is-taiwan-flag"></span>
                             <span class="langText">台灣正體</span>
                         </button>
-                        <!-- <button class="item lang-button" data-target-lang="en-US" data-target-lang-flag="america">
+                        <button class="item lang-button" data-target-lang="en-US" data-target-lang-flag="america">
                             <span class="ts-flag is-america-flag"></span>
                             <span class="langText">English (US)</span>
-                        </button> -->
+                        </button>
                     </div>
                 </div>
                 <div class="column"></div>
@@ -341,15 +341,15 @@
                         <label class="ts-radio is-small">
                             <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:images"
                                 checked />
-                            <span data-lang="picture"></span>
+                            <span data-lang="images"></span>
                         </label>
                         <label class="ts-radio is-small">
                             <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:videos" />
-                            <span data-lang="video"></span>
+                            <span data-lang="videos"></span>
                         </label>
                         <label class="ts-radio is-small">
                             <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:links" />
-                            <span data-lang="link"></span>
+                            <span data-lang="links"></span>
                         </label>
                         <label class="ts-radio is-small">
                             <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:spaces" />
