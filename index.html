@@ -62,12 +62,11 @@
         }
 
         function getQuery() {
-            const result = [
-                selectedVtubers.length ? `(#${selectedVtubers.map(x => x.value).join(",")})` : "", // Tag
+            return [
+                selectedVtubers.length ? `(#${selectedVtubers.map(x => x.value).join(document.querySelector("#field-vtuber-and-or .is-active").getAttribute("data-and-or") === "and" ? "," : " OR ")})` : "", // Tag
                 document.querySelector(".taq-type:checked").getAttribute("data-taq-query"), // Type
                 ...[...document.querySelectorAll(".taq-min")].filter(x => x.value.length).map(el => `${el.getAttribute("data-taq-key")}:${el.value}`), // Mins
-            ];
-            return result.join(" ");
+            ].join(" ");
         }
 
         function makeVtuberMenu() {
@@ -119,6 +118,10 @@
             })
             document.getElementById("field-vtuber-filter").addEventListener("focus", () => {
                 showDropdown();
+            })
+            document.getElementById("field-vtuber-and-or").addEventListener("click", e => {
+                e.target.parentNode.querySelectorAll("a").forEach(x => x.classList.remove("is-active"));
+                e.target.classList.add("is-active");
             })
             document.addEventListener("click", e => {
                 if (!document.getElementById("field-vtuber-menu").parentNode.classList.contains("hide")) {
@@ -178,14 +181,23 @@
             <div class="column is-15-minimal is-8-standard is-8-maximal">
                 <div class="ts-text is-label">目標</div>
                 <div class="ts-space"></div>
-                <div class="is-fluid">
-                    <div class="ts-input is-fluid is-end-icon">
-                        <input type="text" placeholder="篩選 VTuber..." id="field-vtuber-filter" />
-                        <span class="ts-icon is-magnifying-glass-icon"></span>
+
+                <div class="ts-row is-compact">
+                    <div class="column is-fluid">
+                        <div class="ts-input is-fluid is-end-icon">
+                            <input type="text" placeholder="篩選 VTuber..." id="field-vtuber-filter" />
+                            <span class="ts-icon is-magnifying-glass-icon"></span>
+                        </div>
+                        <div class="ts-segment is-dense hide animate__animated">
+                            <div class="ts-menu is-fluid is-bottom-left is-separated is-visible animate__animated"
+                                id="field-vtuber-menu">
+                            </div>
+                        </div>
                     </div>
-                    <div class="ts-segment is-dense hide animate__animated">
-                        <div class="ts-menu is-fluid is-bottom-left is-separated is-visible animate__animated"
-                            id="field-vtuber-menu">
+                    <div class="column">
+                        <div class="ts-tab is-dense is-segmented" id="field-vtuber-and-or">
+                            <a class="item is-active" data-and-or="and">且</a>
+                            <a class="item" data-and-or="or">或</a>
                         </div>
                     </div>
                 </div>
