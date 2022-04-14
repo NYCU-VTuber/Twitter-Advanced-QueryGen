@@ -50,6 +50,65 @@
         }
     </style>
     <script>
+        // Multilang
+        function changeLang() {
+            for (const [k, v] of Object.entries(window.langs[window.lang])) {
+                document.querySelectorAll(`[data-lang="${k}"]`).forEach(e => {
+                    e.innerText = v;
+                })
+                document.querySelectorAll(`[data-lang-placeholder="${k}"]`).forEach(e => {
+                    e.placeholder = v;
+                })
+            }
+        };
+
+        function getWord(key) {
+            return window.langs[window.lang][key];
+        }
+
+        function getFlagClass(flagLang){
+            return `is-${flagLang}-flag`
+        }
+
+        function showLangMenu(){
+            document.getElementById('langMenu').classList.add('is-visible');
+        }
+
+        function hideLangMenu(){
+            document.getElementById('langMenu').classList.remove('is-visible');
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            window.langs = await (await fetch("/lang.json")).json();
+            window.lang = "zh-TW";
+            window.langFlag = "taiwan";
+            window.langText = "台灣正體";
+            
+            document.getElementById("currentLang").innerText = window.langText;
+            changeLang();
+
+            [...document.getElementsByClassName("lang-button")].forEach(b => {
+                b.addEventListener("click", () => {
+                    const flagDOM = document.getElementById("currentLangFlag");
+                    flagDOM.classList.remove(getFlagClass(window.langFlag));
+                    
+                    window.lang = b.dataset.targetLang;
+                    window.langFlag = b.dataset.targetLangFlag;
+                    window.langText = b.querySelector(".langText").innerText;
+
+                    flagDOM.classList.add(getFlagClass(window.langFlag));
+                    document.getElementById("currentLang").innerText = window.langText;
+                    
+                    changeLang();
+                })
+            });
+
+            document.getElementById("changeLang").addEventListener("click", () => {
+                showLangMenu();
+            })
+        })
+    </script>
+    <script>
         let selectedVtubers = [];
 
         function sleep(ms) {
@@ -98,16 +157,16 @@
                 // Tag
                 selectedVtubers.length
                     ? `(#${selectedVtubers
-                            .map(x => x.value)
-                            .join(document.querySelector("#field-vtuber-and-or .is-active").getAttribute("data-taq-and-or"))
-                        })`
-                    : "", 
+                        .map(x => x.value)
+                        .join(document.querySelector("#field-vtuber-and-or .is-active").getAttribute("data-taq-and-or"))
+                    })`
+                    : "",
                 // Type
-                document.querySelector(".taq-type:checked").getAttribute("data-taq-query"), 
+                document.querySelector(".taq-type:checked").getAttribute("data-taq-query"),
                 // Mins
                 ...[...document.querySelectorAll(".taq-min")]
                     .filter(x => x.value.length)
-                    .map(el => `${el.getAttribute("data-taq-key")}:${el.value}`), 
+                    .map(el => `${el.getAttribute("data-taq-key")}:${el.value}`),
             ].join(" ");
         }
 
@@ -158,13 +217,17 @@
             // VTubers
             window.vtubers = await fetch("/vtubers.json").then((res) => res.json());
 
-            document.getElementById("field-vtuber-filter").addEventListener("input", () => {makeVtuberMenu()});
-            document.getElementById("field-vtuber-filter").addEventListener("focus", () => {showDropdown();});
+            document.getElementById("field-vtuber-filter").addEventListener("input", () => { makeVtuberMenu() });
+            document.getElementById("field-vtuber-filter").addEventListener("focus", () => { showDropdown(); });
             document.getElementById("field-vtuber-and-or").addEventListener("click", e => {
                 e.target.parentNode.querySelectorAll("a").forEach(x => x.classList.remove("is-active"));
                 e.target.classList.add("is-active");
             });
             document.addEventListener("click", e => {
+                if (e.target !== document.getElementById("changeLang") && !document.getElementById("changeLang").contains(e.target)) {
+                    hideLangMenu();
+                };
+
                 if (!document.getElementById("field-vtuber-menu").parentNode.classList.contains("hide")) {
                     const whiteList = [
                         document.getElementById("field-vtuber-filter"),
@@ -183,13 +246,13 @@
                 const url = `https://twitter.com/search?q=${encodeURIComponent(getQuery())}`;
                 window.open(url, "_blank");
             });
-            document.getElementById("copy").addEventListener("click", async() => {
+            document.getElementById("copy").addEventListener("click", async () => {
                 navigator.clipboard.writeText(getQuery());
                 const textNode = document.getElementById("copy").getElementsByTagName("span")[1];
 
-                textNode.innerText = "已複製！";
+                textNode.innerText = getWord("copied");
                 await sleep(1000);
-                textNode.innerText = "複製到剪貼簿";
+                textNode.innerText = getWord("copy-to-clipboard");
             });
             makeVtuberMenu();
         });
@@ -203,11 +266,33 @@
     <!-- End Google Tag Manager (noscript) -->
     <div class="ts-content is-tertiary is-fitted">
         <div class="ts-container is-narrow">
-            <div class="ts-tab">
-                <a href="https://nycu.moe" class="item">VTuber Toolbox</a>
-                <a href="#!" class="item is-active">
-                    <span class="ts-icon is-twitter-icon"></span>
-                    QueryGen</a>
+            <div class="ts-row is-middle-aligned">
+                <div class="column is-fluid">
+                    <div class="ts-tab">
+                        <a href="https://nycu.moe" class="item is-not-minimal">VTuber Toolbox</a>
+                        <a href="#!" class="item is-active">
+                            <span class="ts-icon is-twitter-icon"></span>
+                            QueryGen</a>
+                    </div>
+                </div>
+                <div class="column">
+                    <button class="ts-button is-small is-ghost is-start-icon is-dense" id="changeLang">
+                        <span class="ts-icon ts-flag is-taiwan-flag" id="currentLangFlag"></span>
+                        <span id="currentLang"></span>
+                    </button>
+                    <div class="ts-menu is-dropdown is-start-icon is-bottom-left" id="langMenu">
+                        <button class="item lang-button" data-target-lang="zh-TW" data-target-lang-flag="taiwan">
+                            <span class="ts-flag is-taiwan-flag" ></span>
+                            <span class="langText">台灣正體</span>
+                        </button>
+                        <!-- <button class="item lang-button" data-target-lang="en-US" data-target-lang-flag="america">
+                            <span class="ts-flag is-america-flag"></span>
+                            <span class="langText">English (US)</span>
+                        </button> -->
+                    </div>
+                </div>
+                <div class="column"></div>
+                <div class="column"></div>
             </div>
         </div>
     </div>
@@ -216,9 +301,7 @@
         <div class="ts-space"></div>
         <div class="ts-container is-very-narrow">
             <div class="ts-header is-big is-heavy">Twitter Advanced QueryGen</div>
-            <div class="ts-text is-secondary">
-                VTuber Fan Art 的 Twitter 進階搜尋。
-            </div>
+            <div class="ts-text is-secondary" data-lang="secondary-title"></div>
         </div>
         <div class="ts-space"></div>
     </div>
@@ -227,13 +310,13 @@
     <div class="ts-container is-very-narrow">
         <div class="ts-grid">
             <div class="column is-15-minimal is-8-standard is-8-maximal">
-                <div class="ts-text is-label">目標</div>
+                <div class="ts-text is-label" data-lang="target-vtubers"></div>
                 <div class="ts-space"></div>
 
                 <div class="ts-row is-compact">
                     <div class="column is-fluid">
                         <div class="ts-input is-fluid is-end-icon">
-                            <input type="text" placeholder="篩選 VTuber..." id="field-vtuber-filter" />
+                            <input type="text" id="field-vtuber-filter" data-lang-placeholder="filter-vtuber-ph" />
                             <span class="ts-icon is-magnifying-glass-icon"></span>
                         </div>
                         <div class="ts-segment is-dense hide animate__animated"
@@ -244,8 +327,8 @@
                     </div>
                     <div class="column">
                         <div class="ts-tab is-dense is-segmented" id="field-vtuber-and-or">
-                            <a class="item is-active" data-taq-and-or=",">且</a>
-                            <a class="item" data-taq-and-or=" OR ">或</a>
+                            <a class="item is-active" data-taq-and-or="," data-lang="and"></a>
+                            <a class="item" data-taq-and-or=" OR " data-lang="or"></a>
                         </div>
                     </div>
                 </div>
@@ -253,23 +336,24 @@
             <div class="column is-minimal-only is-1-minimal"></div>
             <div class="column is-16-minimal is-8-standard is-8-maximal">
                 <div class="ts-wrap">
-                    <div class="ts-text is-label">類別</div>
+                    <div class="ts-text is-label" data-lang="media-type"></div>
                     <div class="ts-wrap">
                         <label class="ts-radio is-small">
-                            <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:images" checked/>
-                            圖片
+                            <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:images"
+                                checked />
+                            <span data-lang="picture"></span>
                         </label>
                         <label class="ts-radio is-small">
                             <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:videos" />
-                            影片
+                            <span data-lang="video"></span>
                         </label>
                         <label class="ts-radio is-small">
                             <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:links" />
-                            連結
+                            <span data-lang="link"></span>
                         </label>
                         <label class="ts-radio is-small">
                             <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:spaces" />
-                            Twitter Spaces
+                            <span data-lang="twitter-spaces"></span>
                         </label>
                     </div>
                 </div>
@@ -278,21 +362,21 @@
         <div class="ts-space is-large"></div>
         <div class="ts-grid is-relaxed is-3-columns">
             <div class="column">
-                <div class="ts-text is-label">最低轉推數</div>
+                <div class="ts-text is-label" data-lang="min-retweet"></div>
                 <div class="ts-space"></div>
                 <div class="ts-input is-underlined is-fluid">
                     <input type="number" step="1" min="0" class="taq-min" data-taq-key="min_retweets" />
                 </div>
             </div>
             <div class="column">
-                <div class="ts-text is-label">最低愛心數</div>
+                <div class="ts-text is-label" data-lang="min-like"></div>
                 <div class="ts-space"></div>
                 <div class="ts-input is-underlined is-fluid">
                     <input type="number" step="1" min="0" class="taq-min" data-taq-key="min_faves" />
                 </div>
             </div>
             <div class="column">
-                <div class="ts-text is-label">最低回覆數</div>
+                <div class="ts-text is-label" data-lang="min-reply"></div>
                 <div class="ts-space"></div>
                 <div class="ts-input is-underlined is-fluid">
                     <input type="number" step="1" min="0" class="taq-min" data-taq-key="min_replies" />
@@ -307,13 +391,13 @@
             <div class="column">
                 <button class="ts-button is-start-icon" id="search">
                     <span class="ts-icon is-twitter-icon"></span>
-                    搜尋
+                    <span data-lang="search"></span>
                 </button>
             </div>
             <div class="column">
                 <button class="ts-button is-start-icon is-secondary" id="copy">
                     <span class="ts-icon is-copy-icon"></span>
-                    <span>複製到剪貼簿</span>
+                    <span data-lang="copy-to-clipboard"></span>
                 </button>
             </div>
         </div>
