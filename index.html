@@ -1,476 +1,350 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <!-- Google Tag Manager -->
     <script>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", "GTM-T9V7CFX");
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s),
+                dl = l != "dataLayer" ? "&l=" + l : "";
+            j.async = true;
+            j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+            f.parentNode.insertBefore(j, f);
+        })(window, document, "script", "dataLayer", "GTM-T9V7CFX");
     </script>
     <!-- End Google Tag Manager -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/4.0.0-beta.3/tocas.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/4.0.0-beta.3/tocas.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/4.0.0-beta.3/tocas.min.js"></script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <title>Twitter Advanced QueryGen - NYCU VTuber Club</title>
     <style>
-      .hide {
-        display: none !important;
-      }
+        .hide {
+            display: none !important;
+        }
 
-      :root {
-        --animate-duration: 450ms;
-        --animate-delay: 0s;
-      }
+        :root {
+            --animate-duration: 450ms;
+            --animate-delay: 0s;
+        }
 
-      ::-webkit-scrollbar {
-        width: 5px;
-      }
-      ::-webkit-scrollbar-track {
-        -webkit-border-radius: 10px;
-        border-radius: 10px;
-      }
-      ::-webkit-scrollbar-thumb {
-        -webkit-border-radius: 4px;
-        border-radius: 4px;
-        background: var(--ts-gray-800);
-      }
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            -webkit-border-radius: 10px;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            -webkit-border-radius: 4px;
+            border-radius: 4px;
+            background: var(--ts-gray-800);
+        }
     </style>
     <script>
-      let selectedVtubers = [];
+        let selectedVtubers = [];
 
-      function sleep(ms) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
-      }
+        function sleep(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        }
 
-      const DROPDOWN_ANIMATIONS = {
-        IN: "animate__fadeInDown",
-        OUT: "animate__fadeOutUp",
-      };
-      const DROPDOWN_PARENT_ANIMATIONS = {
-        IN: "animate__fadeIn",
-        OUT: "animate__fadeOut",
-      };
-      Object.freeze(DROPDOWN_ANIMATIONS);
-      Object.freeze(DROPDOWN_PARENT_ANIMATIONS);
+        const DROPDOWN_ANIMATIONS = {
+            IN: "animate__fadeInDown",
+            OUT: "animate__fadeOutUp",
+        };
+        const DROPDOWN_PARENT_ANIMATIONS = {
+            IN: "animate__fadeIn",
+            OUT: "animate__fadeOut",
+        };
+        Object.freeze(DROPDOWN_ANIMATIONS);
+        Object.freeze(DROPDOWN_PARENT_ANIMATIONS);
 
-      async function showDropdown() {
-        document
-          .getElementById("field-vtuber-menu")
-          .parentNode.classList.remove(DROPDOWN_PARENT_ANIMATIONS.OUT);
-        document
-          .getElementById("field-vtuber-menu")
-          .classList.remove(DROPDOWN_ANIMATIONS.OUT);
+        async function showDropdown() {
+            const menu = document.getElementById("field-vtuber-menu");
 
-        document
-          .getElementById("field-vtuber-menu")
-          .parentNode.classList.remove("hide");
+            menu.parentNode.classList.remove(DROPDOWN_PARENT_ANIMATIONS.OUT);
+            menu.classList.remove(DROPDOWN_ANIMATIONS.OUT);
 
-        document
-          .getElementById("field-vtuber-menu")
-          .parentNode.classList.add(DROPDOWN_PARENT_ANIMATIONS.IN);
-        document
-          .getElementById("field-vtuber-menu")
-          .classList.add(DROPDOWN_ANIMATIONS.IN);
-      }
+            menu.parentNode.classList.remove("hide");
 
-      async function hideDropdown() {
-        document
-          .getElementById("field-vtuber-menu")
-          .parentNode.classList.remove(DROPDOWN_PARENT_ANIMATIONS.IN);
-        document
-          .getElementById("field-vtuber-menu")
-          .classList.remove(DROPDOWN_ANIMATIONS.IN);
+            menu.parentNode.classList.add(DROPDOWN_PARENT_ANIMATIONS.IN);
+            menu.classList.add(DROPDOWN_ANIMATIONS.IN);
+        }
 
-        document
-          .getElementById("field-vtuber-menu")
-          .parentNode.classList.add(DROPDOWN_PARENT_ANIMATIONS.OUT);
-        document
-          .getElementById("field-vtuber-menu")
-          .classList.add(DROPDOWN_ANIMATIONS.OUT);
+        async function hideDropdown() {
+            const menu = document.getElementById("field-vtuber-menu");
 
-        await sleep(300);
+            menu.parentNode.classList.remove(DROPDOWN_PARENT_ANIMATIONS.IN);
+            menu.classList.remove(DROPDOWN_ANIMATIONS.IN);
 
-        document
-          .getElementById("field-vtuber-menu")
-          .parentNode.classList.add("hide");
-      }
+            menu.parentNode.classList.add(DROPDOWN_PARENT_ANIMATIONS.OUT);
+            menu.classList.add(DROPDOWN_ANIMATIONS.OUT);
 
-      function getQuery() {
-        return [
-          selectedVtubers.length
-            ? `(#${selectedVtubers
-                .map((x) => x.value)
-                .join(
-                  document
-                    .querySelector("#field-vtuber-and-or .is-active")
-                    .getAttribute("data-and-or") === "and"
-                    ? ","
-                    : " OR "
-                )})`
-            : "", // Tag
-          document
-            .querySelector(".taq-type:checked")
-            .getAttribute("data-taq-query"), // Type
-          ...[...document.querySelectorAll(".taq-min")]
-            .filter((x) => x.value.length)
-            .map((el) => `${el.getAttribute("data-taq-key")}:${el.value}`), // Mins
-        ].join(" ");
-      }
+            await sleep(300);
 
-      function makeVtuberMenu() {
-        const vtuberMenu = document.getElementById("field-vtuber-menu");
-        vtuberMenu.innerHTML = "";
+            menu.parentNode.classList.add("hide");
+        }
 
-        let template = document.getElementById(
-          "field-vtuber-menu-button-template"
-        );
-        window.vtubers
-          .filter((x) =>
-            [x.text, ...x.searches].some((y) =>
-              y
-                .toLowerCase()
-                .startsWith(
-                  document
-                    .getElementById("field-vtuber-filter")
-                    .value.toLowerCase()
-                )
-            )
-          )
-          .forEach((vtuber) => {
-            const button = template.content.cloneNode(true);
-            button.querySelector("[name=content]").innerText = vtuber.text;
-            button.querySelector("img").src = vtuber.avatar;
-            if (selectedVtubers.some((x) => x.value === vtuber.value)) {
-              button.querySelector("button").classList.add("is-active");
-            }
-            button.querySelector("button").addEventListener("click", () => {
-              if (selectedVtubers.some((x) => x.value === vtuber.value)) {
-                selectedVtubers = selectedVtubers.filter(
-                  (x) => x.value !== vtuber.value
-                );
-              } else {
-                selectedVtubers.push(vtuber);
-              }
+        function getQuery() {
+            return [
+                // Tag
+                selectedVtubers.length
+                    ? `(#${selectedVtubers
+                            .map(x => x.value)
+                            .join(document.querySelector("#field-vtuber-and-or .is-active").getAttribute("data-taq-and-or"))
+                        })`
+                    : "", 
+                // Type
+                document.querySelector(".taq-type:checked").getAttribute("data-taq-query"), 
+                // Mins
+                ...[...document.querySelectorAll(".taq-min")]
+                    .filter(x => x.value.length)
+                    .map(el => `${el.getAttribute("data-taq-key")}:${el.value}`), 
+            ].join(" ");
+        }
+
+        function makeVtuberMenu() {
+            const vtuberMenu = document.getElementById("field-vtuber-menu");
+            vtuberMenu.innerHTML = "";
+
+            let template = document.getElementById("field-vtuber-menu-button-template");
+            const filterText = document.getElementById("field-vtuber-filter").value.toLowerCase();
+            window.vtubers.filter(x =>
+                [x.text, ...x.searches].some(y => y.toLowerCase().startsWith(filterText))
+            ).forEach((vtuber) => {
+                const button = template.content.cloneNode(true);
+                button.querySelector("[name=content]").innerText = vtuber.text;
+                button.querySelector("img").src = vtuber.avatar;
+                if (selectedVtubers.some(x => x.value === vtuber.value)) {
+                    button.querySelector("button").classList.add("is-active");
+                }
+                button.querySelector("button").addEventListener("click", () => {
+                    if (selectedVtubers.some(x => x.value === vtuber.value)) {
+                        selectedVtubers = selectedVtubers.filter((x) => x.value !== vtuber.value);
+                    } else {
+                        selectedVtubers.push(vtuber);
+                    }
+                });
+                vtuberMenu.appendChild(button);
             });
-            vtuberMenu.appendChild(button);
-          });
 
-        const chips = document.getElementById("field-vtuber-selected");
-        chips.innerHTML = "";
-        template = document.getElementById(
-          "field-vtuber-selected-chip-template"
-        );
-        selectedVtubers.forEach((vtuber) => {
-          const chip = template.content.cloneNode(true);
+            const chips = document.getElementById("field-vtuber-selected");
+            chips.innerHTML = "";
+            template = document.getElementById("field-vtuber-selected-chip-template");
+            selectedVtubers.forEach(vtuber => {
+                const chip = template.content.cloneNode(true);
 
-          chip.querySelector("span").innerText = vtuber.text;
-          chip.querySelector("img").src = vtuber.avatar;
-          chip.querySelector("button").addEventListener("click", () => {
-            selectedVtubers = selectedVtubers.filter(
-              (x) => x.value !== vtuber.value
-            );
+                chip.querySelector("span").innerText = vtuber.text;
+                chip.querySelector("img").src = vtuber.avatar;
+                chip.querySelector("button").addEventListener("click", () => {
+                    selectedVtubers = selectedVtubers.filter(x => x.value !== vtuber.value);
+                    makeVtuberMenu();
+                });
+                chips.appendChild(chip);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Licence Year
+            document.getElementById("year").innerText = new Date().getFullYear();
+            // VTubers
+            window.vtubers = await fetch("/vtubers.json").then((res) => res.json());
+
+            document.getElementById("field-vtuber-filter").addEventListener("input", () => {makeVtuberMenu()});
+            document.getElementById("field-vtuber-filter").addEventListener("focus", () => {showDropdown();});
+            document.getElementById("field-vtuber-and-or").addEventListener("click", e => {
+                e.target.parentNode.querySelectorAll("a").forEach(x => x.classList.remove("is-active"));
+                e.target.classList.add("is-active");
+            });
+            document.addEventListener("click", e => {
+                if (!document.getElementById("field-vtuber-menu").parentNode.classList.contains("hide")) {
+                    const whiteList = [
+                        document.getElementById("field-vtuber-filter"),
+                        document.getElementById("field-vtuber-menu"),
+                        ...document.getElementById("field-vtuber-menu").childNodes,
+                    ];
+                    if (!whiteList.includes(e.target) && e.target.getAttribute("data-taq-is-menu-button") !== "1") {
+                        hideDropdown();
+                    } else {
+                        makeVtuberMenu();
+                    }
+                }
+            });
+
+            document.getElementById("search").addEventListener("click", () => {
+                const url = `https://twitter.com/search?q=${encodeURIComponent(getQuery())}`;
+                window.open(url, "_blank");
+            });
+            document.getElementById("copy").addEventListener("click", async() => {
+                navigator.clipboard.writeText(getQuery());
+                const textNode = document.getElementById("copy").getElementsByTagName("span")[1];
+
+                textNode.innerText = "已複製！";
+                await sleep(1000);
+                textNode.innerText = "複製到剪貼簿";
+            });
             makeVtuberMenu();
-          });
-          chips.appendChild(chip);
         });
-      }
-
-      document.addEventListener("DOMContentLoaded", async () => {
-        // Licence Year
-        document.getElementById("year").innerText = new Date().getFullYear();
-        // VTubers
-        window.vtubers = await fetch("/vtubers.json").then((res) => res.json());
-
-        document
-          .getElementById("field-vtuber-filter")
-          .addEventListener("input", (e) => {
-            makeVtuberMenu();
-          });
-        document
-          .getElementById("field-vtuber-filter")
-          .addEventListener("focus", () => {
-            showDropdown();
-          });
-        document
-          .getElementById("field-vtuber-and-or")
-          .addEventListener("click", (e) => {
-            e.target.parentNode
-              .querySelectorAll("a")
-              .forEach((x) => x.classList.remove("is-active"));
-            e.target.classList.add("is-active");
-          });
-        document.addEventListener("click", (e) => {
-          if (
-            !document
-              .getElementById("field-vtuber-menu")
-              .parentNode.classList.contains("hide")
-          ) {
-            const whiteList = [
-              document.getElementById("field-vtuber-filter"),
-              document.getElementById("field-vtuber-menu"),
-              ...document.getElementById("field-vtuber-menu").childNodes,
-            ];
-            if (
-              !whiteList.includes(e.target) &&
-              e.target.getAttribute("data-taq-is-menu-button") !== "1"
-            ) {
-              hideDropdown();
-            } else {
-              makeVtuberMenu();
-            }
-          }
-        });
-
-        document.getElementById("search").addEventListener("click", () => {
-          const url = `https://twitter.com/search?q=${encodeURIComponent(
-            getQuery()
-          )}`;
-          window.open(url, "_blank");
-        });
-        document.getElementById("copy").addEventListener("click", () => {
-          navigator.clipboard.writeText(getQuery());
-          document
-            .getElementById("copy")
-            .getElementsByTagName("span")[1].innerText = "已複製！";
-          sleep(1000).then(() => {
-            document
-              .getElementById("copy")
-              .getElementsByTagName("span")[1].innerText = "複製到剪貼簿";
-          });
-        });
-        makeVtuberMenu();
-      });
     </script>
-  </head>
+</head>
 
-  <body>
+<body>
     <!-- Google Tag Manager (noscript) -->
-    <noscript
-      ><iframe
-        src="https://www.googletagmanager.com/ns.html?id=GTM-T9V7CFX"
-        height="0"
-        width="0"
-        style="display: none; visibility: hidden"
-      ></iframe
-    ></noscript>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T9V7CFX" height="0" width="0"
+            style="display: none; visibility: hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <div class="ts-content is-tertiary is-fitted">
-      <div class="ts-container is-narrow">
-        <div class="ts-tab">
-          <a href="https://nycu.moe" class="item">VTuber Toolbox</a>
-          <a href="#!" class="item is-active">
-            <span class="ts-icon is-twitter-icon"></span>
-            QueryGen</a
-          >
+        <div class="ts-container is-narrow">
+            <div class="ts-tab">
+                <a href="https://nycu.moe" class="item">VTuber Toolbox</a>
+                <a href="#!" class="item is-active">
+                    <span class="ts-icon is-twitter-icon"></span>
+                    QueryGen</a>
+            </div>
         </div>
-      </div>
     </div>
     <div class="ts-divider"></div>
     <div class="ts-content is-tertiary is-vertically-padded">
-      <div class="ts-space"></div>
-      <div class="ts-container is-very-narrow">
-        <div class="ts-header is-big is-heavy">Twitter Advanced QueryGen</div>
-        <div class="ts-text is-secondary">
-          VTuber Fan Art 的 Twitter 進階搜尋。
+        <div class="ts-space"></div>
+        <div class="ts-container is-very-narrow">
+            <div class="ts-header is-big is-heavy">Twitter Advanced QueryGen</div>
+            <div class="ts-text is-secondary">
+                VTuber Fan Art 的 Twitter 進階搜尋。
+            </div>
         </div>
-      </div>
-      <div class="ts-space"></div>
+        <div class="ts-space"></div>
     </div>
     <div class="ts-divider"></div>
     <div class="ts-space is-big"></div>
     <div class="ts-container is-very-narrow">
-      <div class="ts-grid">
-        <div class="column is-15-minimal is-8-standard is-8-maximal">
-          <div class="ts-text is-label">目標</div>
-          <div class="ts-space"></div>
+        <div class="ts-grid">
+            <div class="column is-15-minimal is-8-standard is-8-maximal">
+                <div class="ts-text is-label">目標</div>
+                <div class="ts-space"></div>
 
-          <div class="ts-row is-compact">
-            <div class="column is-fluid">
-              <div class="ts-input is-fluid is-end-icon">
-                <input
-                  type="text"
-                  placeholder="篩選 VTuber..."
-                  id="field-vtuber-filter"
-                />
-                <span class="ts-icon is-magnifying-glass-icon"></span>
-              </div>
-              <div
-                class="ts-segment is-dense hide animate__animated"
-                style="overflow-y: scroll; max-height: 25rem; height: 100%"
-              >
-                <div
-                  class="ts-menu is-fluid is-bottom-left is-separated is-visible animate__animated"
-                  id="field-vtuber-menu"
-                ></div>
-              </div>
+                <div class="ts-row is-compact">
+                    <div class="column is-fluid">
+                        <div class="ts-input is-fluid is-end-icon">
+                            <input type="text" placeholder="篩選 VTuber..." id="field-vtuber-filter" />
+                            <span class="ts-icon is-magnifying-glass-icon"></span>
+                        </div>
+                        <div class="ts-segment is-dense hide animate__animated"
+                            style="overflow-y: scroll; max-height: 25rem; height: 100%">
+                            <div class="ts-menu is-fluid is-bottom-left is-separated is-visible animate__animated"
+                                id="field-vtuber-menu"></div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="ts-tab is-dense is-segmented" id="field-vtuber-and-or">
+                            <a class="item is-active" data-taq-and-or=",">且</a>
+                            <a class="item" data-taq-and-or=" OR ">或</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-minimal-only is-1-minimal"></div>
+            <div class="column is-16-minimal is-8-standard is-8-maximal">
+                <div class="ts-wrap">
+                    <div class="ts-text is-label">類別</div>
+                    <div class="ts-wrap">
+                        <label class="ts-radio is-small">
+                            <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:images" checked/>
+                            圖片
+                        </label>
+                        <label class="ts-radio is-small">
+                            <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:videos" />
+                            影片
+                        </label>
+                        <label class="ts-radio is-small">
+                            <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:links" />
+                            連結
+                        </label>
+                        <label class="ts-radio is-small">
+                            <input name="taq-type" type="radio" class="taq-type" data-taq-query="filter:spaces" />
+                            Twitter Spaces
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ts-space is-large"></div>
+        <div class="ts-grid is-relaxed is-3-columns">
+            <div class="column">
+                <div class="ts-text is-label">最低轉推數</div>
+                <div class="ts-space"></div>
+                <div class="ts-input is-underlined is-fluid">
+                    <input type="number" step="1" min="0" class="taq-min" data-taq-key="min_retweets" />
+                </div>
             </div>
             <div class="column">
-              <div
-                class="ts-tab is-dense is-segmented"
-                id="field-vtuber-and-or"
-              >
-                <a class="item is-active" data-and-or="and">且</a>
-                <a class="item" data-and-or="or">或</a>
-              </div>
+                <div class="ts-text is-label">最低愛心數</div>
+                <div class="ts-space"></div>
+                <div class="ts-input is-underlined is-fluid">
+                    <input type="number" step="1" min="0" class="taq-min" data-taq-key="min_faves" />
+                </div>
             </div>
-          </div>
-        </div>
-        <div class="column is-minimal-only is-1-minimal"></div>
-        <div class="column is-16-minimal is-8-standard is-8-maximal">
-          <div class="ts-wrap">
-            <div class="ts-text is-label">類別</div>
-            <div class="ts-wrap">
-              <label class="ts-radio is-small">
-                <input
-                  name="taq-type"
-                  type="radio"
-                  checked
-                  class="taq-type"
-                  data-taq-query="filter:images"
-                />
-                圖片
-              </label>
-              <label class="ts-radio is-small">
-                <input
-                  name="taq-type"
-                  type="radio"
-                  class="taq-type"
-                  data-taq-query="filter:videos"
-                />
-                影片
-              </label>
-              <label class="ts-radio is-small">
-                <input
-                  name="taq-type"
-                  type="radio"
-                  class="taq-type"
-                  data-taq-query="filter:links"
-                />
-                連結
-              </label>
-              <label class="ts-radio is-small">
-                <input
-                  name="taq-type"
-                  type="radio"
-                  class="taq-type"
-                  data-taq-query="filter:spaces"
-                />
-                Twitter Spaces
-              </label>
+            <div class="column">
+                <div class="ts-text is-label">最低回覆數</div>
+                <div class="ts-space"></div>
+                <div class="ts-input is-underlined is-fluid">
+                    <input type="number" step="1" min="0" class="taq-min" data-taq-key="min_replies" />
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-      <div class="ts-space is-large"></div>
-      <div class="ts-grid is-relaxed is-3-columns">
-        <div class="column">
-          <div class="ts-text is-label">最低轉推數</div>
-          <div class="ts-space"></div>
-          <div class="ts-input is-underlined is-fluid">
-            <input
-              type="number"
-              step="1"
-              min="0"
-              class="taq-min"
-              data-taq-key="min_retweets"
-            />
-          </div>
+        <div class="ts-space is-large"></div>
+        <div class="ts-wrap" id="field-vtuber-selected"></div>
+        <div class="ts-space is-large"></div>
+        <div class="ts-space is-large"></div>
+        <div class="ts-row is-center-aligned">
+            <div class="column">
+                <button class="ts-button is-start-icon" id="search">
+                    <span class="ts-icon is-twitter-icon"></span>
+                    搜尋
+                </button>
+            </div>
+            <div class="column">
+                <button class="ts-button is-start-icon is-secondary" id="copy">
+                    <span class="ts-icon is-copy-icon"></span>
+                    <span>複製到剪貼簿</span>
+                </button>
+            </div>
         </div>
-        <div class="column">
-          <div class="ts-text is-label">最低愛心數</div>
-          <div class="ts-space"></div>
-          <div class="ts-input is-underlined is-fluid">
-            <input
-              type="number"
-              step="1"
-              min="0"
-              class="taq-min"
-              data-taq-key="min_faves"
-            />
-          </div>
+        <div class="ts-space is-large"></div>
+        <div class="ts-text is-center-aligned is-description">
+            Made by <a href="https://leko.moe">Leko</a> and
+            <a href="https://edisonlee55.com">edisonlee55</a> with ❤️
         </div>
-        <div class="column">
-          <div class="ts-text is-label">最低回覆數</div>
-          <div class="ts-space"></div>
-          <div class="ts-input is-underlined is-fluid">
-            <input
-              type="number"
-              step="1"
-              min="0"
-              class="taq-min"
-              data-taq-key="min_replies"
-            />
-          </div>
+        <div class="ts-space is-large"></div>
+        <div class="ts-text is-center-aligned is-description">
+            © <span id="year"></span> NYCU VTuber Club | 交大 VTuber 社
         </div>
-      </div>
-      <div class="ts-space is-large"></div>
-      <div class="ts-wrap" id="field-vtuber-selected"></div>
-      <div class="ts-space is-large"></div>
-      <div class="ts-space is-large"></div>
-      <div class="ts-row is-center-aligned">
-        <div class="column">
-          <button class="ts-button is-start-icon" id="search">
-            <span class="ts-icon is-twitter-icon"></span>
-            搜尋
-          </button>
-        </div>
-        <div class="column">
-          <button class="ts-button is-start-icon is-secondary" id="copy">
-            <span class="ts-icon is-copy-icon"></span>
-            <span>複製到剪貼簿</span>
-          </button>
-        </div>
-      </div>
-      <div class="ts-space is-large"></div>
-      <div class="ts-text is-center-aligned is-description">
-        Made by <a href="https://leko.moe">Leko</a> and
-        <a href="https://edisonlee55.com">edisonlee55</a> with ❤️
-      </div>
-      <div class="ts-space is-large"></div>
-      <div class="ts-text is-center-aligned is-description">
-        © <span id="year"></span> NYCU VTuber Club | 交大 VTuber 社
-      </div>
     </div>
 
     <template id="field-vtuber-selected-chip-template">
-      <div class="ts-chip is-small is-dense">
-        <div class="ts-image">
-          <img />
+        <div class="ts-chip is-small is-dense">
+            <div class="ts-image">
+                <img />
+            </div>
+            <span></span>
+            <button class="ts-close"></button>
         </div>
-        <span></span>
-        <button class="ts-close"></button>
-      </div>
     </template>
     <template id="field-vtuber-menu-button-template">
-      <button class="item" data-taq-is-menu-button="1">
-        <span class="ts-avatar is-circular" data-taq-is-menu-button="1">
-          <img data-taq-is-menu-button="1" />
-        </span>
-        <span name="content" data-taq-is-menu-button="1"></span>
-      </button>
+        <button class="item" data-taq-is-menu-button="1">
+            <span class="ts-avatar is-circular" data-taq-is-menu-button="1">
+                <img data-taq-is-menu-button="1" />
+            </span>
+            <span name="content" data-taq-is-menu-button="1"></span>
+        </button>
     </template>
-  </body>
+</body>
+
 </html>
