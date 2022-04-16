@@ -1,5 +1,7 @@
 {
     "zh-TW": {
+        "__langFlag": "taiwan",
+        "__langText": "台灣正體",
         "copied": "已複製！",
         "copy-to-clipboard": "複製到剪貼簿",
         "secondary-title": "VTuber Fan Art 的 Twitter 進階搜尋。",
@@ -18,6 +20,8 @@
         "search": "搜尋"
     },
     "en-US": {
+        "__langFlag": "america",
+        "__langText": "English (US)",
         "copied": "Copied!",
         "copy-to-clipboard": "Copy to clipboard",
         "secondary-title": "Twitter Advanced Search for VTuber Fan Art.",

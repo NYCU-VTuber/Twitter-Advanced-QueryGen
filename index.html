@@ -5,6 +5,12 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="prefetch" href="/lang.json">
+    <link rel="prefetch" href="/vtubers.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/4.0.0-beta.3/tocas.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/4.0.0-beta.3/tocas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <!-- Google Tag Manager -->
     <script>
         (function (w, d, s, l, i) {
@@ -19,10 +25,6 @@
         })(window, document, "script", "dataLayer", "GTM-T9V7CFX");
     </script>
     <!-- End Google Tag Manager -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/4.0.0-beta.3/tocas.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/4.0.0-beta.3/tocas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <title>Twitter Advanced QueryGen - NYCU VTuber Club</title>
     <style>
         .hide {
@@ -52,7 +54,8 @@
     <script>
         // Multilang
         function changeLang() {
-            for (const [k, v] of Object.entries(window.langs[window.lang])) {
+            const langObj = window.langs[window.lang]
+            for (const [k, v] of Object.entries(langObj)) {
                 document.querySelectorAll(`[data-lang="${k}"]`).forEach(e => {
                     e.innerText = v;
                 })
@@ -60,6 +63,15 @@
                     e.placeholder = v;
                 })
             }
+
+            document.getElementById("currentLang").innerText = langObj.__langText;
+
+            for(const lang of Object.keys(window.langs)) {
+                document.getElementById("currentLangFlag").classList.remove(getFlagClass(window.langs[lang].__langFlag))
+            }
+            document.getElementById("currentLangFlag").classList.add(getFlagClass(langObj.__langFlag));
+
+            sessionStorage.setItem("lang", window.lang);
         };
 
         function getWord(key) {
@@ -80,25 +92,39 @@
 
         document.addEventListener("DOMContentLoaded", async () => {
             window.langs = await (await fetch("/lang.json")).json();
-            window.lang = "zh-TW";
-            window.langFlag = "taiwan";
-            window.langText = "台灣正體";
 
-            document.getElementById("currentLang").innerText = window.langText;
+            // Init Lang buttons
+            const template = document.getElementById("langButtonTemplate");
+            for(const lang of Object.keys(window.langs)){
+                const langObj = window.langs[lang];
+                const clone = template.content.cloneNode(true);
+                clone.querySelector(".ts-flag").classList.add(getFlagClass(langObj.__langFlag));
+                clone.querySelector(".langText").innerText = langObj.__langText;
+                clone.querySelector("button").dataset.targetLang = lang;
+                clone.querySelector("button").addEventListener("click", () => {
+                    window.lang = lang;
+                    changeLang();
+                    hideLangMenu();
+                });
+                document.getElementById("langMenu").appendChild(clone);
+            }
+
+            if (sessionStorage.getItem("lang") === null) {
+                const browserLang = navigator.language || navigator.userLanguage;
+                if (window.langs.hasOwnProperty(browserLang)) {
+                    window.lang = browserLang;
+                } else {
+                    window.lang = "en-US";
+                }
+                sessionStorage.setItem("lang", window.lang);
+            }
+
+            window.lang = sessionStorage.getItem("lang");
             changeLang();
 
             [...document.getElementsByClassName("lang-button")].forEach(b => {
                 b.addEventListener("click", () => {
-                    const flagDOM = document.getElementById("currentLangFlag");
-                    flagDOM.classList.remove(getFlagClass(window.langFlag));
-
                     window.lang = b.dataset.targetLang;
-                    window.langFlag = b.dataset.targetLangFlag;
-                    window.langText = b.querySelector(".langText").innerText;
-
-                    flagDOM.classList.add(getFlagClass(window.langFlag));
-                    document.getElementById("currentLang").innerText = window.langText;
-
                     changeLang();
                 })
             });
@@ -281,14 +307,12 @@
                         <span id="currentLang"></span>
                     </button>
                     <div class="ts-menu is-dropdown is-start-icon is-bottom-left" id="langMenu">
-                        <button class="item lang-button" data-target-lang="zh-TW" data-target-lang-flag="taiwan">
-                            <span class="ts-flag is-taiwan-flag"></span>
-                            <span class="langText">台灣正體</span>
-                        </button>
-                        <button class="item lang-button" data-target-lang="en-US" data-target-lang-flag="america">
-                            <span class="ts-flag is-america-flag"></span>
-                            <span class="langText">English (US)</span>
-                        </button>
+                        <template id="langButtonTemplate">
+                            <button class="item lang-button" data-target-lang="">
+                                <span class="ts-flag"></span>
+                                <span class="langText"></span>
+                            </button>
+                        </template>
                     </div>
                 </div>
                 <div class="column"></div>
